@@ -4,7 +4,7 @@ cd `dirname $0`
 ##################### CONFIG ZONE ##########################
 
 LOCAL_REGISTRY="registry.example.com/trivy"
-PUSH_TO_LOCAL_REGISTRY="yes"
+PUSH_TO_LOCAL_REGISTRY="no"
 
 TRIVYDBV2="ghcr.io/aquasecurity/trivy-db:2"
 TRIVYJAVADBV1="ghcr.io/aquasecurity/trivy-java-db:1"
