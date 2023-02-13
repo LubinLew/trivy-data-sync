@@ -8,6 +8,9 @@ PUSH_TO_LOCAL_REGISTRY="no"
 
 TRIVYDBV2="ghcr.io/aquasecurity/trivy-db:2"
 TRIVYJAVADBV1="ghcr.io/aquasecurity/trivy-java-db:1"
+
+# how many days the old db will store
+KEEP_OLD_DAY="3"
 ####################### LOG ZONE ############################
 LOGTAG="MAIN"
 IS_RUN_BACKGROUD="no"
@@ -65,7 +68,7 @@ function get_db_next_update_epoch() {
 ###################################################################
 function get_db_update_at() {
   UPDATE_AT=$(tar -O -xf $1 metadata.json | jq '.UpdatedAt' | tr -d '"')
-  DATE_STRING=$(date -d "${UPDATE_AT} +0000" +%Y%M%d_%H%m%S)
+  DATE_STRING=$(date -d "${UPDATE_AT} +0000" +%Y%m%d%H%M%S)
   echo ${DATE_STRING}
 }
 
@@ -80,7 +83,7 @@ function download_and_push_db() {
     CURRENT_EPOCH=$(date +%s)
     NEXT_UPDATE_EPOCH=$(get_db_next_update_epoch latest.tar.gz)
     if [ ${NEXT_UPDATE_EPOCH} -lt ${CURRENT_EPOCH} ] ; then
-      show_msg "New Version: ${NEXT_UPDATE_TIME} +0000"
+      show_msg "New Version Avaliable: ${NEXT_UPDATE_EPOCH}(`date -d@${NEXT_UPDATE_EPOCH}`)"
     else
       show_msg "Up to date"
       return
@@ -118,6 +121,9 @@ function download_and_push_db() {
     rm -f latest.tar.gz 
   fi
   ln -s ${NEWNAME}.tar.gz latest.tar.gz
+  
+  # delete old files
+  find . -name '*.tar.gz' -mtime +${KEEP_OLD_DAY} -delete
 }
 
 
